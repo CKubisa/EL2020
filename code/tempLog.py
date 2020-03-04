@@ -40,14 +40,18 @@ def readF(tempPin):
 	return tempFahr
 
 try:
-	while True:
-		input_state = GPIO.input(buttonPin)
-		if input_state == True:
-			for i in range (blinkTime):
-				oneBlink(redPin)
-			time.sleep(.2)
-			data = readF(tempPin)
-			print (data)
+
+	with open("../log/templog.csv", "a") as log:
+
+		while True:
+			input_state = GPIO.input(buttonPin)
+			if input_state == False:
+				for i in range (blinkTime):
+					oneBlink(redPin)
+				time.sleep(.2)
+				data = readF(tempPin)
+				print (data)
+				log.write("{0},{1}\n".format(time.strftime("%Y/%m/%d %H:%M:%S"),str(data)))
 
 except KeyboardInterrupt:
 	os.system('clear')
