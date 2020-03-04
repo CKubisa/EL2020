@@ -43,7 +43,7 @@ tempPin)
 try:
 	while True:
 		input_state = GPIO.input(buttonPin)
-		if input_state == False:
+		if input_state == True:
 			for i in range (blinkTime):
 				oneBlink(redPin)
 			time.sleep(.2)
