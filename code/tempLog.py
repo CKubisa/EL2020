@@ -3,11 +3,14 @@ import RPi.GPIO as GPIO
 import Adafruit_DHT
 import time
 import os
+import sqlite as mydb
+import sys
 
 #Assign GPIO pins
 redPin = 27
 tempPin = 17
 buttonPin = 26
+con = None
 
 #Temp and Humidity Sensor
 
@@ -41,17 +44,18 @@ def readF(tempPin):
 
 try:
 
-	with open("../log/templog.csv", "a") as log:
+	#with open("../log/templog.csv", "a") as log:
+	con = mydb.connect('../log/templog.db')
+	cur = con.cursor()
 
 		while True:
-			input_state = GPIO.input(buttonPin)
-			if input_state == False:
-				for i in range (blinkTime):
-					oneBlink(redPin)
-				time.sleep(.2)
-				data = readF(tempPin)
-				print (data)
-				log.write("{0},{1}\n".format(time.strftime("%Y/%m/%d %H:%M:%S"),str(data)))
+			time.sleep(60)
+			for i in range (blinkTime):
+				oneBlink(redPin)
+			time.sleep(.2)
+			data = readF(tempPin)
+			print (data)
+			log.write("{0},{1}\n".format(time.strftime("%Y/%m/%d-%H:%M:%S"),str(data)))
 
 except KeyboardInterrupt:
 	os.system('clear')
