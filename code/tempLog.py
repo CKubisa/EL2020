@@ -65,37 +65,32 @@ def alert(tempF):
 		server.quit
 		eChk = 1
 
-#oldTime = 60
-#humid = readH(tempPin)
-#tempF = readF(tempPin)
+oldTime = time.time()
 
 try:
 	#with open("../log/templog.csv", "a") as log:
 	while True:
-		oldTime = 60
+		#oldTime = time();
 		humid = readH(tempPin)
 		tempF = readF(tempPin)
 
 		if 60 <= float(tempF) <= 78:
 			eChk = 0
-			GPIO.output(redPin, False)
+			GPIO.output(redPin, True)
 			GPIO.output(greenPin, False)
 		else:
-			GPIO.output(greenPin, False)
+			GPIO.output(greenPin, True)
 			alert(tempF)
 			oneBlink(redPin)
 
 		if time.time() - oldTime > 59:
-			tempF = humid = print(tempF,humid)
-			cur.execute('INSERT INTO templog values(?,?,?)', (time.strftime('%Y/%m/%d-%H:%M:%S'),tempF,humid)) 
-		con.commit()
-		time.sleep(5)
-		table = con.execute("select * from templog")
-		os.system('clear')
-		print("%-30s %-20s %-20s" % ("Date/Time", "Temp", "Humidity"))
-		for row in table:
-			print("%-30s %-20s %-20s" %(row[0], row[1], row[2]))
-		oldTime = time.time();
+			cur.execute('INSERT INTO templog values(?,?,?)', (time.strftime('%Y/%m/%d-%H:%M:%S'),tempF,humid))
+			con.commit()
+			table = con.execute("select * from templog")
+			print("%-30s %-20s %-20s" % ("Date/Time", "Temp", "Humidity"))
+			for row in table:
+				print("%-30s %-20s %-20s" %(row[0], row[1], row[2]))
+			oldTime = time.time();
 
 except KeyboardInterrupt:
 	os.system('clear')
