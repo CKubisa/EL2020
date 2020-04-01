@@ -28,7 +28,7 @@ GPIO.setup(greenPin,GPIO.OUT)
 
 #connect to database
 #---------------------------------------------------------------------
-con = sql.connect('../log/templog.db')
+con = sql.connect('../log/tempLog.db')
 cur = con.cursor()
 eChk = 0
 
@@ -65,28 +65,30 @@ def alert(tempF):
 		server.quit
 		eChk = 1
 
-oldTime = time.time()
+oldTime = 60
+humid = readH(tempPin)
+tempF = readF(tempPin)
 
 try:
 	#with open("../log/templog.csv", "a") as log:
 	while True:
-		#oldTime = time();
 		humid = readH(tempPin)
 		tempF = readF(tempPin)
 
 		if 60 <= float(tempF) <= 78:
 			eChk = 0
-			GPIO.output(redPin, True)
+			GPIO.output(redPin, False)
 			GPIO.output(greenPin, False)
 		else:
-			GPIO.output(greenPin, True)
-			alert(tempF)
+			GPIO.output(greenPin, False)
+			#alert(tempF)
 			oneBlink(redPin)
 
 		if time.time() - oldTime > 59:
-			cur.execute('INSERT INTO templog values(?,?,?)', (time.strftime('%Y/%m/%d-%H:%M:%S'),tempF,humid))
+			cur.execute('INSERT INTO tempLog values(?,?,?)', (time.strftime('%Y/%m/%d-%H:%M:%S'),tempF,humid)) 
 			con.commit()
 			table = con.execute("select * from templog")
+			os.system('clear')
 			print("%-30s %-20s %-20s" % ("Date/Time", "Temp", "Humidity"))
 			for row in table:
 				print("%-30s %-20s %-20s" %(row[0], row[1], row[2]))
