@@ -1,0 +1,91 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+		<meta http-equiv="Pragma" content="no-cache" />
+		<meta http-equiv="Expires" content="0" />
+
+		<title>Raspberry Pi Alarm</title>
+
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+		<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+	</head>
+
+	<body onload="go()">
+
+		<center>
+			<p style="font-size:30px" id="c">Click To Disable Alarm</p>
+			<div id="table_div" style="width: 2000px; height: 1000px"></div>
+		</center>
+
+		<script type='text/javascript'>
+			//Press
+			document.getElementById("c").addEventListener("click", myFunction);
+
+			function myFunction()
+		        {
+				 $.getJSON('/button')
+			}
+	
+			//Load the charts libraries
+			google.charts.load('current', {'packages':['table']});
+			google.charts.setOnLoadCallback(drawTable);
+
+			//Draws Chart			
+			function drawTable()
+			{
+				var options = {
+	            			title: 'Temperture Log',
+	            			curveType: 'function',
+	            			legend: { position: 'bottom' }
+	        			};
+				
+       				var data = new google.visualization.DataTable();
+        			data.addColumn('string', 'Sensor');
+        			data.addColumn('string', 'TimeofDay');
+				//I cant make this work
+				data.addRows(chartData,options);
+
+       				 var table = new google.visualization.Table(document.getElementById('table_div'));
+       				 table.draw(data, {showRowNumber: true, width: '100%', height: '100%'});
+      			}
+
+			//create empty array as a global
+			var chartData = [];
+
+			//This function is called when the page loads
+			//This function is called when the page loads
+			function go(){
+				goTime = new Date();
+				console.log('It\'s Go Time! '+goTime);
+				getData();
+				setInterval(function() {
+					xTime = new Date();
+					console.clear();
+					console.log('Update Initiated: '+xTime);
+					getData();
+				}, 60000);
+
+			}
+			//grabs the data from the sqlData app.route and pushes it into an array
+			function getData()
+			{
+				//Clear the array first
+				chartData = [];
+				chartData2 =[];
+				$.getJSON('/sqlData', function(chartJSON) {
+					console.log(chartJSON);
+					for (i = 0; i < chartJSON.length; i++){
+						chartData.push(chartJSON[i].Sensor,chartJSON[i].myTime);
+					};
+					drawTable();
+				});
+			}
+
+		</script>
+
+
+	</body>
